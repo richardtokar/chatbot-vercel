@@ -5,10 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatbot Boutique</title>
   
-  <!-- Google Fonts: Inter -->
+  <!-- Google Fonts: Poppins -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
   
   <!-- Font Awesome for icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
@@ -16,19 +16,21 @@
   <style>
     /* --- THEME & VARIABLES --- */
     :root {
-      --bg-gradient-start: #1E1E2E;
-      --bg-gradient-end: #1A1A2E;
+      --bg-gradient-start: #2a2a35;
+      --bg-gradient-end: #1a1a20;
       --chat-window-bg: rgba(0, 0, 0, 0.2);
-      --text-primary: #EAEAEA;
-      --text-secondary: #8A8A9E;
-      --accent-gradient-start: #7F5AF0;
-      --accent-gradient-end: #623CEA;
+      --text-primary: #e0e0e0;
+      --text-secondary: #a0a0a0;
+      --accent-purple: #a855f7;
+      --accent-purple-light: #c084fc;
       --bot-bubble-bg: #3A3A50;
+      --user-bubble-gradient-start: #7F5AF0;
+      --user-bubble-gradient-end: #623CEA;
       --input-bg: #2A2A3A;
       --border-color: #4A4A6A;
     }
 
-    /* --- BASE & LAYOUT --- */
+    /* --- GLOBAL STYLES --- */
     * {
       box-sizing: border-box;
       margin: 0;
@@ -40,10 +42,10 @@
     }
 
     body {
-      font-family: 'Inter', sans-serif;
+      font-family: 'Poppins', sans-serif;
       background: radial-gradient(circle, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
       color: var(--text-primary);
-      display: grid; /* Use Grid for easy centering */
+      display: grid;
       place-items: center;
       padding: 1rem;
     }
@@ -51,23 +53,19 @@
     .main-container {
       width: 100%;
       max-width: 800px;
-      height: 95vh; /* Take up most of the viewport height */
+      height: 95vh;
       max-height: 900px;
       display: flex;
       flex-direction: column;
     }
 
-    /* --- TYPOGRAPHY --- */
+    /* --- HEADER --- */
     h1 {
       font-weight: 700;
       font-size: 2.25rem;
       text-align: center;
       margin-bottom: 1.5rem;
-      background: linear-gradient(90deg, #A993FF, #7F5AF0);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      color: transparent;
+      color: var(--accent-purple);
     }
 
     /* --- CHAT WINDOW --- */
@@ -84,28 +82,22 @@
       border: 1px solid var(--border-color);
       margin-bottom: 1.5rem;
     }
-
-    /* Custom Scrollbar Styling */
-    #chat::-webkit-scrollbar {
-      width: 8px;
-    }
-    #chat::-webkit-scrollbar-track {
-      background: transparent;
-    }
+    
+    /* Custom Scrollbar */
+    #chat::-webkit-scrollbar { width: 8px; }
+    #chat::-webkit-scrollbar-track { background: transparent; }
     #chat::-webkit-scrollbar-thumb {
       background-color: #4A4A6A;
       border-radius: 10px;
       border: 2px solid transparent;
       background-clip: content-box;
     }
-    #chat::-webkit-scrollbar-thumb:hover {
-      background-color: #623CEA;
-    }
+    #chat::-webkit-scrollbar-thumb:hover { background-color: var(--accent-purple); }
 
     /* --- CHAT BUBBLES --- */
     .message {
       display: flex;
-      align-items: flex-start; /* Aligns avatar with top of bubble */
+      align-items: flex-start;
       gap: 0.75rem;
       max-width: 85%;
     }
@@ -115,9 +107,10 @@
       font-weight: 400;
       line-height: 1.5;
       word-wrap: break-word;
+      border-radius: 22px; /* Softer, more rounded corners */
     }
 
-    /* Bot's Bubble Styling */
+    /* Bot Message Styling */
     .message.bot {
       align-self: flex-start;
     }
@@ -125,30 +118,43 @@
       width: 40px;
       height: 40px;
       border-radius: 50%;
-      background: #4A4A6A;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: var(--accent-gradient-start);
       flex-shrink: 0;
+    }
+    .message.bot .avatar svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--accent-purple);
     }
     .message.bot .bubble {
       background-color: var(--bot-bubble-bg);
-      border-radius: 0 18px 18px 18px;
+      border-top-left-radius: 6px;
     }
 
-    /* User's Bubble Styling */
+    /* User Message Styling */
     .message.user {
       align-self: flex-end;
     }
     .message.user .bubble {
-      background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
-      border-radius: 18px 0 18px 18px;
+      background: linear-gradient(90deg, var(--user-bubble-gradient-start), var(--user-bubble-gradient-end));
+      border-top-right-radius: 6px;
     }
     
-    .typing-indicator {
-      font-style: italic;
-      color: var(--text-secondary);
+    /* New Message Animation */
+    @keyframes fadeSlideUp {
+      from {
+        opacity: 0;
+        transform: translateY(15px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .new-message-animation {
+      animation: fadeSlideUp 0.4s ease-out forwards;
     }
 
     /* --- INPUT AREA --- */
@@ -159,7 +165,7 @@
       border-radius: 25px;
       padding: 0.5rem;
       align-items: center;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Added depth */
     }
 
     #input {
@@ -170,13 +176,12 @@
       padding: 0.5rem 1rem;
       font-size: 1rem;
       outline: none;
+      border-radius: 20px; /* Needed for the focus shadow */
+      transition: box-shadow 0.3s ease;
     }
-    #input::placeholder {
-      color: var(--text-secondary);
-    }
+    #input::placeholder { color: var(--text-secondary); }
     #input:focus {
-      box-shadow: 0 0 15px rgba(127, 90, 240, 0.4);
-      border-radius: 20px; /* To contain the glow */
+      box-shadow: 0 0 8px rgba(168, 85, 247, 0.7); /* Purple glow on focus */
     }
 
     #send {
@@ -184,32 +189,31 @@
       width: 40px;
       height: 40px;
       border: none;
-      background: linear-gradient(45deg, var(--accent-gradient-start), var(--accent-gradient-end));
+      background-color: var(--accent-purple);
       color: white;
       border-radius: 50%;
       cursor: pointer;
       font-size: 1rem;
       display: grid;
       place-items: center;
-      transition: transform 0.2s ease, filter 0.2s ease;
+      transition: background-color 0.3s ease, transform 0.3s ease;
     }
     #send:hover {
-      transform: scale(1.1);
-      filter: brightness(1.15);
+      background-color: var(--accent-purple-light);
+      transform: scale(1.05); /* Slight scale on hover */
     }
-    #send i {
-      transform: translateX(1px); /* Small visual adjustment */
-    }
+    #send i { transform: translateX(1px); }
 
-    /* --- FOOTER & ATTRIBUTION --- */
+    /* --- FOOTER --- */
     footer {
       text-align: center;
       padding-top: 1.5rem;
     }
     .attribution {
-      font-size: 0.8rem;
+      font-size: 0.75rem; /* Smaller font size */
       color: var(--text-secondary);
       margin-bottom: 0.75rem;
+      opacity: 0.7; /* Reduced opacity */
     }
     .attribution a {
       color: var(--text-primary);
@@ -217,40 +221,25 @@
       font-weight: bold;
       transition: color 0.2s ease;
     }
-    .attribution a:hover {
-      color: var(--accent-gradient-start);
-    }
+    .attribution a:hover { color: var(--accent-purple); }
+    
     .social-icons a {
       color: var(--text-secondary);
       margin: 0 0.75rem;
       font-size: 1.5rem;
-      transition: color 0.2s ease;
+      transition: color 0.3s ease, transform 0.3s ease;
     }
     .social-icons a:hover {
-      color: var(--accent-gradient-start);
+      color: var(--accent-purple);
+      transform: scale(1.15); /* Grow on hover */
     }
 
     /* --- RESPONSIVE DESIGN --- */
     @media (max-width: 600px) {
-      body {
-        padding: 0.5rem;
-      }
-      .main-container {
-        height: 100%;
-        max-height: none;
-      }
-      h1 {
-        font-size: 1.75rem;
-      }
-      #chat {
-        padding: 0.75rem;
-      }
-      .message {
-        max-width: 90%;
-      }
-      .message .bubble {
-        padding: 0.6rem 1rem;
-      }
+      .main-container { height: 100%; max-height: none; }
+      h1 { font-size: 1.75rem; }
+      #chat { padding: 0.75rem; }
+      .message { max-width: 90%; }
     }
   </style>
 </head>
@@ -272,6 +261,7 @@
         Designed by <a href="http://richardtokar.us" target="_blank" rel="noopener noreferrer">Richard Tokar</a>
       </div>
       <div class="social-icons">
+        <!-- Remember to replace these with your actual URLs -->
         <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
           <i class="fab fa-linkedin"></i>
         </a>
@@ -287,27 +277,24 @@
     const input = document.getElementById("input");
     const send = document.getElementById("send");
 
-    // Function to create a user message element
     function createUserMessage(message) {
       const messageWrapper = document.createElement('div');
       messageWrapper.className = 'message user';
-      
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.textContent = message;
-      
       messageWrapper.appendChild(bubble);
       return messageWrapper;
     }
 
-    // Function to create a bot message element (or placeholder)
     function createBotMessage(content, isTyping = false) {
       const messageWrapper = document.createElement('div');
       messageWrapper.className = 'message bot';
       
       const avatar = document.createElement('div');
       avatar.className = 'avatar';
-      avatar.innerHTML = '<i class="fas fa-robot"></i>';
+      // New friendly SVG icon
+      avatar.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.486 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.514 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z M8.5 11C7.672 11 7 11.672 7 12.5C7 13.328 7.672 14 8.5 14C9.328 14 10 13.328 10 12.5C10 11.672 9.328 11 8.5 11ZM15.5 11C14.672 11 14 11.672 14 12.5C14 13.328 14.672 14 15.5 14C16.328 14 17 13.328 17 12.5C17 11.672 16.328 11 15.5 11Z"/></svg>`;
       
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
@@ -322,23 +309,19 @@
       return messageWrapper;
     }
 
-    // --- Main Send Logic ---
     const handleSend = async () => {
       const message = input.value.trim();
       if (!message) return;
 
-      // 1. Display user's message
       const userMessageEl = createUserMessage(message);
       chatDiv.appendChild(userMessageEl);
-      input.value = ""; // Clear input immediately
+      input.value = "";
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
-      // 2. Display bot's typing placeholder
       const botPlaceholderEl = createBotMessage('', true);
       chatDiv.appendChild(botPlaceholderEl);
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
-      // 3. Fetch bot's actual reply
       try {
         const res = await fetch("/api/chat", {
           method: "POST",
@@ -347,8 +330,13 @@
         });
         const data = await res.json();
         
-        // Replace placeholder content with the real reply
-        botPlaceholderEl.querySelector('.bubble').innerHTML = data.reply;
+        // Update placeholder with real reply and trigger animation
+        botPlaceholderEl.querySelector('.bubble').textContent = data.reply;
+        botPlaceholderEl.classList.add('new-message-animation');
+        // Remove class after animation to allow it to be re-triggered
+        setTimeout(() => {
+          botPlaceholderEl.classList.remove('new-message-animation');
+        }, 400);
 
       } catch (error) {
         botPlaceholderEl.querySelector('.bubble').textContent = "Sorry, something went wrong. Please try again.";
@@ -358,7 +346,6 @@
       }
     };
 
-    // Event Listeners
     send.addEventListener("click", handleSend);
     input.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
