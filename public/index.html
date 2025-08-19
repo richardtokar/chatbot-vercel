@@ -14,7 +14,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
-    /* --- THEME COLORS --- */
     :root {
       --bg-dark: #0f0f17;
       --bg-gradient: radial-gradient(circle at top left, #1a1a26, #0f0f17 70%);
@@ -28,7 +27,6 @@
       --input-bg: #1c1c28;
     }
 
-    /* --- RESET --- */
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
@@ -40,6 +38,30 @@
       height: 100vh;
       padding: 1rem;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* --- BACKGROUND PARTICLES --- */
+    .particles {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      overflow: hidden;
+      z-index: 0;
+      pointer-events: none;
+    }
+    .particle {
+      position: absolute;
+      border-radius: 50%;
+      background: var(--neon-cyan);
+      opacity: 0.6;
+      animation: float 12s linear infinite;
+    }
+    .particle:nth-child(odd) { background: var(--neon-magenta); }
+    @keyframes float {
+      from { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      20% { opacity: 0.6; }
+      to { transform: translateY(-10vh) scale(1); opacity: 0; }
     }
 
     .main-container {
@@ -48,9 +70,10 @@
       height: 95vh;
       display: flex;
       flex-direction: column;
+      position: relative;
+      z-index: 1;
     }
 
-    /* --- HEADER --- */
     h1 {
       font-family: 'Orbitron', sans-serif;
       font-weight: 600;
@@ -63,7 +86,6 @@
       letter-spacing: 2px;
     }
 
-    /* --- CHAT WINDOW --- */
     #chat {
       flex-grow: 1;
       background-color: rgba(255, 255, 255, 0.03);
@@ -83,27 +105,18 @@
       border-radius: 4px;
     }
 
-    /* --- CHAT BUBBLES --- */
-    .message {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.75rem;
-      max-width: 85%;
-    }
-
+    .message { display: flex; align-items: flex-start; gap: 0.75rem; max-width: 85%; }
     .bubble {
       padding: 0.75rem 1.25rem;
       line-height: 1.5;
       border-radius: 22px;
       font-size: 1rem;
     }
-
     .message.bot { align-self: flex-start; }
     .message.bot .bubble {
       background-color: var(--bot-bubble);
       border: 1px solid rgba(255,255,255,0.1);
     }
-
     .message.user { align-self: flex-end; }
     .message.user .bubble {
       background: var(--user-gradient);
@@ -112,7 +125,6 @@
       border: none;
     }
 
-    /* --- INPUT AREA --- */
     .input-area {
       display: flex;
       gap: 0.75rem;
@@ -122,7 +134,6 @@
       align-items: center;
       box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
     }
-
     #input {
       flex-grow: 1;
       border: none;
@@ -152,7 +163,6 @@
       box-shadow: 0 0 12px var(--neon-magenta), 0 0 20px var(--neon-cyan);
     }
 
-    /* --- FOOTER --- */
     footer {
       text-align: center;
       padding-top: 1rem;
@@ -168,7 +178,6 @@
       font-weight: 600;
     }
     .attribution a:hover { color: var(--neon-magenta); }
-
     .social-icons a {
       color: var(--lavender);
       margin: 0 0.75rem;
@@ -180,7 +189,6 @@
       text-shadow: 0 0 10px var(--neon-cyan);
     }
 
-    /* --- MESSAGE ANIMATION --- */
     @keyframes fadeSlideUp {
       from { opacity: 0; transform: translateY(15px); }
       to { opacity: 1; transform: translateY(0); }
@@ -192,10 +200,14 @@
     @media (max-width: 600px) {
       h1 { font-size: 1.75rem; }
       .message { max-width: 90%; }
+      .main-container { height: 100%; }
     }
   </style>
 </head>
 <body>
+
+  <!-- PARTICLES BACKGROUND -->
+  <div class="particles" id="particles"></div>
 
   <div class="main-container">
     <h1>Chatbot Boutique</h1>
@@ -213,8 +225,8 @@
         Designed by <a href="http://richardtokar.us" target="_blank" rel="noopener noreferrer">Richard Tokar</a>
       </div>
       <div class="social-icons">
-        <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
-        <a href="YOUR_YOUTUBE_URL" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
+        <a href="YOUR_LINKEDIN_URL" target="_blank"><i class="fab fa-linkedin"></i></a>
+        <a href="YOUR_YOUTUBE_URL" target="_blank"><i class="fab fa-youtube"></i></a>
       </div>
     </footer>
   </div>
@@ -234,15 +246,21 @@
       return wrapper;
     }
 
-    function createBotMessage(content, isTyping = false) {
+    function createBotMessage(content) {
       const wrapper = document.createElement('div');
       wrapper.className = 'message bot';
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      bubble.textContent = content || "...";
+      bubble.textContent = content;
       wrapper.appendChild(bubble);
       return wrapper;
     }
+
+    // Add initial welcome message
+    window.addEventListener("DOMContentLoaded", () => {
+      const welcome = createBotMessage("How can I assist you today?");
+      chatDiv.appendChild(welcome);
+    });
 
     const handleSend = async () => {
       const message = input.value.trim();
@@ -253,7 +271,7 @@
       input.value = "";
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
-      const botPlaceholderEl = createBotMessage('', true);
+      const botPlaceholderEl = createBotMessage("...");
       chatDiv.appendChild(botPlaceholderEl);
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
@@ -266,10 +284,8 @@
         const data = await res.json();
         botPlaceholderEl.querySelector('.bubble').textContent = data.reply;
         botPlaceholderEl.classList.add('new-message-animation');
-        setTimeout(() => {
-          botPlaceholderEl.classList.remove('new-message-animation');
-        }, 400);
-      } catch (error) {
+        setTimeout(() => botPlaceholderEl.classList.remove('new-message-animation'), 400);
+      } catch {
         botPlaceholderEl.querySelector('.bubble').textContent = "Sorry, something went wrong. Please try again.";
       } finally {
         chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -283,6 +299,18 @@
         handleSend();
       }
     });
+
+    // Generate background particles
+    const particlesContainer = document.getElementById("particles");
+    for (let i = 0; i < 20; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      p.style.width = p.style.height = `${Math.random() * 6 + 3}px`;
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${8 + Math.random() * 8}s`;
+      p.style.animationDelay = `${Math.random() * 10}s`;
+      particlesContainer.appendChild(p);
+    }
   </script>
 </body>
 </html>
