@@ -6,21 +6,22 @@
   <title>Chatbot Boutique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Poppins:wght@600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
-    /* --- Dark Theme Inspired by Claude.ai --- */
+    /* --- Redesigned Theme --- */
     :root {
-      --background-color: #1e1e1e; /* Very dark grey */
-      --surface-color: #2d2d2d; /* Slightly lighter dark grey */
-      --text-color-primary: #e0e0e0; /* Light grey for primary text */
-      --text-color-secondary: #a8a8a8; /* Medium grey for less important text */
-      --accent-color: #5865f2; /* A modern, vibrant blue for accents */
-      --accent-hover-color: #4752c4;
-      --user-message-bg: #3a3a3a; /* Darker grey for user messages */
-      --bot-message-bg: #444444; /* Slightly lighter grey for bot messages */
-      --border-color: #333333;
+      --background-gradient-start: #232526;
+      --background-gradient-end: #1a1a1d;
+      --chat-window-bg: #2c2f33; /* Lighter than the background */
+      --text-color-primary: #e8e8e8;
+      --text-color-secondary: #b3b3b3;
+      --accent-purple-start: #8a2be2;
+      --accent-purple-end: #6a0dad;
+      --user-message-bg: #3a3a3a;
+      --bot-message-bg: #444444;
+      --border-color: #404040;
     }
 
     * {
@@ -31,8 +32,8 @@
 
     html, body {
       height: 100%;
-      font-family: 'Inter', sans-serif;
-      background-color: var(--background-color);
+      font-family: 'Inter', sans-serif; /* Readable font for chat */
+      background: linear-gradient(180deg, var(--background-gradient-start) 0%, var(--background-gradient-end) 100%);
       color: var(--text-color-primary);
       display: flex;
       flex-direction: column;
@@ -40,37 +41,71 @@
     }
 
     h1 {
+      font-family: 'Poppins', sans-serif; /* Distinctive font for title */
       text-align: center;
       color: var(--text-color-secondary);
-      padding: 1rem 0;
-      font-weight: 500;
-      font-size: 1.5rem;
-      letter-spacing: 0.5px;
+      font-weight: 600;
+      font-size: 2rem;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem; /* More breathing room */
     }
 
+    /* --- Main Chat Window --- */
     #chat {
-      flex-grow: 1; /* Allows the chat to fill available space */
-      max-width: 800px;
+      flex-grow: 1;
+      max-width: 900px; /* Constrained width */
       width: 100%;
-      margin: 0 auto 1rem auto;
-      background-color: var(--surface-color);
-      border-radius: 8px;
-      padding: 1rem;
-      overflow-y: auto; /* Enables scrolling for messages */
+      margin: 0 auto 1.5rem auto; /* Centered with more breathing room */
+      background-color: var(--chat-window-bg);
+      border-radius: 16px; /* Softer corners */
+      padding: 1.5rem;
+      overflow-y: auto;
       display: flex;
       flex-direction: column;
-      gap: 0.75rem; /* Creates space between messages */
+      gap: 1rem;
       border: 1px solid var(--border-color);
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      position: relative;
+      /* Subtle inner shadow for depth */
+      box-shadow: inset 0 8px 10px -10px rgba(0, 0, 0, 0.7), 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Welcome placeholder message */
+    #chat::before {
+      content: 'Welcome to Chatbot Boutique!\A How can I assist you today?'; /* \A creates a line break */
+      white-space: pre;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: var(--text-color-secondary);
+      text-align: center;
+      font-size: 1rem;
+      pointer-events: none; /* Allows clicking through it */
+    }
+
+    /* Hides the placeholder once a message appears */
+    #chat:has(.message)::before {
+      display: none;
     }
 
     .message {
-      padding: 0.6rem 1rem;
-      border-radius: 12px;
-      line-height: 1.4;
+      padding: 0.75rem 1.25rem;
+      border-radius: 18px;
+      line-height: 1.5;
       max-width: 80%;
-      word-wrap: break-word; /* Prevents long words from overflowing */
-      color: var(--text-color-primary);
+      word-wrap: break-word;
+    }
+    
+    .message:nth-child(odd) {
+      background-color: var(--user-message-bg);
+      align-self: flex-end;
+      border-bottom-right-radius: 6px;
+    }
+
+    .message:nth-child(even) {
+      background-color: var(--bot-message-bg);
+      align-self: flex-start;
+      border-bottom-left-radius: 6px;
     }
 
     .message b {
@@ -79,114 +114,108 @@
       font-weight: 500;
       margin-bottom: 0.2rem;
       color: var(--text-color-secondary);
+      opacity: 0.8;
     }
 
-    .message:nth-child(odd) {
-      background-color: var(--user-message-bg);
-      align-self: flex-end; /* Aligns to the right */
-      border-bottom-right-radius: 4px;
-    }
-
-    .message:nth-child(even) {
-      background-color: var(--bot-message-bg);
-      align-self: flex-start; /* Aligns to the left */
-      border-bottom-left-radius: 4px;
-    }
-
+    /* --- Input Area --- */
     .input-area {
       display: flex;
-      max-width: 800px;
+      max-width: 900px;
       width: 100%;
       margin: 0 auto;
-      gap: 0.5rem;
+      gap: 0.75rem;
+    }
+    
+    /* Wrapper to position the icon inside the input */
+    .input-wrapper {
+      position: relative;
+      flex-grow: 1;
+      display: flex;
+      align-items: center;
+    }
+    
+    .input-wrapper .fa-comment-dots {
+      position: absolute;
+      left: 1rem;
+      color: var(--text-color-secondary);
+      opacity: 0.6;
     }
 
     #input {
-      flex-grow: 1;
+      width: 100%;
       border: 1px solid var(--border-color);
       background-color: var(--surface-color);
       color: var(--text-color-primary);
-      padding: 0.6rem 1rem;
-      border-radius: 16px;
+      padding: 0.8rem 1rem 0.8rem 2.5rem; /* Left padding for icon */
+      border-radius: 25px; /* Pill shape */
       font-size: 1rem;
       transition: box-shadow 0.2s ease-in-out;
     }
-
+    
     #input:focus {
       outline: none;
-      box-shadow: 0 0 0 2px var(--accent-color);
+      box-shadow: 0 0 0 2px var(--accent-purple-start);
     }
-
+    
     #send {
-      padding: 0.6rem 1.2rem;
+      flex-shrink: 0; /* Prevents the button from shrinking */
+      width: 50px;
+      height: 50px;
       border: none;
-      background-color: var(--accent-color);
+      background-image: linear-gradient(45deg, var(--accent-purple-start), var(--accent-purple-end));
       color: white;
-      border-radius: 16px;
+      border-radius: 50%; /* Circular button */
       cursor: pointer;
-      font-size: 1rem;
-      font-weight: 500;
-      transition: background-color 0.2s ease-in-out;
+      font-size: 1.2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease-in-out, filter 0.2s ease;
     }
 
     #send:hover {
-      background-color: var(--accent-hover-color);
+      transform: scale(1.1); /* Hover effect */
+      filter: brightness(1.15);
     }
-
-    .typing-indicator {
-      color: var(--text-color-secondary);
-      font-style: italic;
-    }
-
-    /* ADDITION 3: Styles for the new footer */
+    
+    /* --- Footer / Social Icons --- */
     footer {
       text-align: center;
-      padding: 1.5rem 0 1rem 0; /* Adds vertical space */
-      max-width: 800px; /* Aligns with other content */
-      margin: 0 auto; /* Centers the footer */
+      padding: 2rem 0 1rem 0;
+      max-width: 900px;
+      margin: 0 auto;
     }
 
     footer a {
-      color: var(--text-color-secondary); /* Subtle icon color */
+      color: var(--text-color-secondary);
       text-decoration: none;
-      margin: 0 0.75rem; /* Space between icons */
-      font-size: 1.5rem; /* Icon size */
+      margin: 0 1rem; /* More space between icons */
+      font-size: 1.8rem; /* Larger icons */
       transition: color 0.2s ease-in-out;
     }
 
     footer a:hover {
-      color: var(--accent-color); /* Highlight color on hover */
+      color: var(--accent-purple-start); /* Hover color changed to purple */
     }
 
-    /* --- Responsive Design for Mobile --- */
+    /* --- Responsive Design --- */
     @media (max-width: 600px) {
       body {
         padding: 0.5rem;
       }
       h1 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
       }
       #chat {
-        padding: 0.75rem;
-        border-radius: 6px;
+        padding: 1rem;
+        margin-bottom: 1rem;
       }
       .message {
-        padding: 0.5rem 0.8rem;
-        border-radius: 10px;
-        font-size: 0.9rem;
         max-width: 90%;
       }
-      .input-area {
-        gap: 0.3rem;
-      }
-      #input, #send {
-        padding: 0.5rem 0.8rem;
+      #chat::before {
         font-size: 0.9rem;
-        border-radius: 12px;
-      }
-      footer a {
-        font-size: 1.3rem; /* Slightly smaller icons on mobile */
-        margin: 0 0.6rem;
       }
     }
   </style>
@@ -196,21 +225,26 @@
   <div id="chat"></div>
 
   <div class="input-area">
-    <input type="text" id="input" placeholder="Type a message...">
-    <button id="send">Send</button>
+    <div class="input-wrapper">
+      <i class="fas fa-comment-dots"></i>
+      <input type="text" id="input" placeholder="Type a message...">
+    </div>
+    <button id="send" aria-label="Send Message">
+      <i class="fas fa-paper-plane"></i>
+    </button>
   </div>
-
+  
   <footer>
-    <a href="https://www.linkedin.com/in/richardtokar" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+    <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
       <i class="fab fa-linkedin"></i>
     </a>
-    <a href="https://www.youtube.com/@richard_tokar" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+    <a href="YOUR_YOUTUBE_URL" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
       <i class="fab fa-youtube"></i>
     </a>
   </footer>
 
-
   <script>
+    // --- THIS JAVASCRIPT IS UNCHANGED AND FULLY FUNCTIONAL ---
     const chatDiv = document.getElementById("chat");
     const input = document.getElementById("input");
     const send = document.getElementById("send");
