@@ -1,246 +1,371 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <!-- Add viewport-fit for safe areas on iOS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Chatbot Boutique</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <style>
-    /* Reset */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    :root {
+      --bg-dark: #0f0f17;
+      --bg-gradient: radial-gradient(circle at top left, #1a1a26, #0f0f17 70%);
+      --text-primary: #e5e5e5;
+      --text-secondary: #9a9a9a;
+      --neon-magenta: #ff00ff;
+      --neon-cyan: #00ffff;
+      --lavender: #b388ff;
+      --bot-bubble: #242433;
+      --user-gradient: linear-gradient(135deg, var(--neon-magenta), var(--lavender));
+      --input-bg: #1c1c28;
     }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
       font-family: 'Inter', sans-serif;
-      background: radial-gradient(circle at top left, #0a0a0a, #000000);
-      color: #fff;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
+      display: grid;
+      place-items: center;
+      /* Use dynamic viewport height for mobile toolbars; fall back gracefully */
+      height: 100dvh;
+      padding: clamp(0.5rem, 2vw, 1rem);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + clamp(0.25rem, 1.5vw, 0.75rem));
+      overflow: hidden; /* Contain scroll to the chat area */
       position: relative;
     }
 
-    /* Background particles */
+    /* --- BACKGROUND PARTICLES --- */
     .particles {
       position: absolute;
-      width: 100%;
-      height: 100%;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
       overflow: hidden;
       z-index: 0;
+      pointer-events: none;
     }
-
     .particle {
       position: absolute;
-      width: 6px;
-      height: 6px;
-      background: rgba(0, 255, 255, 0.7);
       border-radius: 50%;
-      animation: drift 20s linear infinite;
+      background: var(--neon-cyan);
+      opacity: 0.6;
+      animation: float 12s linear infinite;
+      will-change: transform, opacity;
+    }
+    .particle:nth-child(odd) { background: var(--neon-magenta); }
+    @keyframes float {
+      from { transform: translateY(100vh) scale(0.5); opacity: 0; }
+      20% { opacity: 0.6; }
+      to { transform: translateY(-10vh) scale(1); opacity: 0; }
     }
 
-    @keyframes drift {
-      from {
-        transform: translateY(100vh) translateX(0);
-        opacity: 0;
-      }
-      25% {
-        opacity: 1;
-      }
-      to {
-        transform: translateY(-10vh) translateX(20px);
-        opacity: 0;
-      }
-    }
-
-    .chat-container {
-      position: relative;
-      z-index: 1;
+    .main-container {
       width: 100%;
-      max-width: 420px;
-      height: 80vh;
-      max-height: 700px;
-      background: rgba(10, 10, 20, 0.95);
-      border-radius: 20px;
-      box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+      max-width: 800px;
+      /* Fill the dynamic viewport height; allow child flex to control scroll areas */
+      height: 100%;
+      min-height: 0; /* Necessary so #chat can shrink below content size */
       display: flex;
       flex-direction: column;
-      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      gap: clamp(0.75rem, 1.5vw, 1rem);
     }
 
-    .chat-header {
-      padding: 15px;
-      text-align: center;
+    h1 {
       font-family: 'Orbitron', sans-serif;
-      font-size: 1.3rem;
-      color: #00ffff;
-      background: rgba(255, 0, 255, 0.1);
-      border-bottom: 1px solid rgba(255, 0, 255, 0.4);
-    }
-
-    .chat-box {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      font-size: 0.95rem;
-    }
-
-    .chat-message {
-      margin-bottom: 12px;
-      padding: 10px 14px;
-      background: rgba(255, 0, 255, 0.1);
-      border: 1px solid rgba(255, 0, 255, 0.3);
-      border-radius: 20px;
-      max-width: 80%;
-      line-height: 1.4;
-    }
-
-    .welcome {
-      color: #00ffff;
+      font-weight: 600;
+      font-size: clamp(1.5rem, 2.8vw + 0.75rem, 3rem);
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 0.25rem;
+      background: linear-gradient(90deg, var(--neon-magenta), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
+      line-height: 1.1;
     }
 
-    .chat-input-container {
+    #chat {
+      flex: 1 1 auto;
+      min-height: 0; /* Enables proper flexbox scrolling */
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
+      padding: clamp(0.75rem, 2vw, 1rem);
+      overflow-y: auto;
       display: flex;
-      padding: 12px;
-      border-top: 1px solid rgba(0, 255, 255, 0.3);
-      background: rgba(0, 0, 0, 0.6);
+      flex-direction: column;
+      gap: clamp(0.75rem, 1.5vw, 1.25rem);
+      box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      /* Mobile scroll ergonomics */
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+      scrollbar-gutter: stable both-edges;
+    }
+    #chat::-webkit-scrollbar { width: 8px; }
+    #chat::-webkit-scrollbar-thumb {
+      background: var(--neon-magenta);
+      border-radius: 4px;
     }
 
-    .chat-input {
-      flex: 1;
-      padding: 10px 15px;
-      border: none;
-      border-radius: 25px;
-      outline: none;
-      background: rgba(255, 255, 255, 0.1);
+    .message { 
+      display: flex; 
+      align-items: flex-start; 
+      gap: 0.75rem; 
+      /* Fit content but cap width for readability across devices */
+      width: fit-content;
+      max-width: min(85%, 42rem);
+      /* Prevent layout breaks on very long words/URLs */
+      overflow-wrap: anywhere;
+      word-break: break-word;
+    }
+    .bubble {
+      padding: 0.75rem 1.25rem;
+      line-height: 1.55;
+      border-radius: 22px;
+      font-size: clamp(0.95rem, 0.5vw + 0.9rem, 1.05rem);
+    }
+    .message.bot { align-self: flex-start; }
+    .message.bot .bubble {
+      background-color: var(--bot-bubble);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .message.user { align-self: flex-end; }
+    .message.user .bubble {
+      background: var(--user-gradient);
       color: #fff;
-      font-size: 1rem;
+      font-weight: 600;
+      border: none;
     }
 
-    .send-btn {
-      margin-left: 10px;
-      width: 45px;
-      height: 45px;
+    .input-area {
+      display: flex;
+      gap: clamp(0.5rem, 1.5vw, 0.75rem);
+      background: var(--input-bg);
+      border-radius: 30px;
+      padding: 0.5rem;
+      align-items: center;
+      box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
+    }
+    #input {
+      flex-grow: 1;
+      border: none;
+      background: transparent;
+      color: var(--text-primary);
+      padding: 0.5rem 1rem;
+      font-size: 1rem;
+      outline: none;
+      min-width: 0; /* Prevent overflow in flex */
+    }
+    #input::placeholder { color: var(--text-secondary); }
+
+    #send {
+      width: clamp(44px, 4.5vw + 34px, 52px);
+      height: clamp(44px, 4.5vw + 34px, 52px);
       border: none;
       border-radius: 50%;
-      background: linear-gradient(135deg, #ff00ff, #00ffff);
-      color: #000;
-      font-weight: bold;
       cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
+      color: white;
+      font-size: clamp(1rem, 0.8vw + 0.9rem, 1.25rem);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      touch-action: manipulation;
+    }
+    #send:hover {
+      transform: scale(1.06);
+      box-shadow: 0 0 12px var(--neon-magenta), 0 0 20px var(--neon-cyan);
     }
 
-    .send-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 0 15px rgba(0, 255, 255, 0.6);
-    }
-
-    .chat-footer {
-      padding: 8px;
-      font-size: 0.75rem;
+    footer {
       text-align: center;
-      border-top: 1px solid rgba(255, 0, 255, 0.3);
-      color: #aaa;
-      background: rgba(0, 0, 0, 0.8);
+      padding-top: 0.25rem;
+    }
+    .attribution {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+    .attribution a {
+      color: var(--neon-cyan);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .attribution a:hover { color: var(--neon-magenta); }
+    .social-icons {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+    .social-icons a {
+      color: var(--lavender);
+      font-size: 1.5rem;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
+    }
+    .social-icons a:hover {
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
     }
 
-    /* Scrollbar for chat */
-    .chat-box::-webkit-scrollbar {
-      width: 6px;
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .new-message-animation {
+      animation: fadeSlideUp 0.4s ease-out forwards;
     }
 
-    .chat-box::-webkit-scrollbar-thumb {
-      background: rgba(0, 255, 255, 0.4);
-      border-radius: 3px;
+    /* Respect reduced motion preferences */
+    @media (prefers-reduced-motion: reduce) {
+      .particle,
+      .new-message-animation {
+        animation: none !important;
+      }
+      #send { transition: none; }
+      #send:hover { transform: none; box-shadow: none; }
     }
 
-    /* Responsive Fixes */
-    @media (max-width: 768px) {
-      .chat-container {
-        width: 95%;
-        height: 90vh;
-        max-height: none;
-        border-radius: 15px;
-      }
-
-      .chat-header {
-        font-size: 1.1rem;
-        padding: 12px;
-      }
-
-      .chat-input {
-        font-size: 0.9rem;
-        padding: 8px 12px;
-      }
-
-      .send-btn {
-        width: 40px;
-        height: 40px;
-      }
-
-      .chat-box {
-        font-size: 0.9rem;
-      }
+    /* Responsive tweaks */
+    @media (max-width: 900px) {
+      .main-container { max-width: 680px; }
     }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 5px;
-      }
-
-      .chat-container {
-        width: 100%;
-        height: 95vh;
-        border-radius: 12px;
-      }
-
-      .chat-header {
-        font-size: 1rem;
-      }
-
-      .chat-box {
-        padding: 10px;
-      }
-
-      .chat-input {
-        font-size: 0.85rem;
-      }
-
-      .send-btn {
-        width: 38px;
-        height: 38px;
-      }
+    @media (max-width: 600px) {
+      h1 { font-size: clamp(1.25rem, 6vw, 1.75rem); }
+      .message { max-width: 90%; }
+      .main-container { height: 100%; }
+      #chat::-webkit-scrollbar { width: 6px; }
     }
   </style>
 </head>
 <body>
-  <!-- Background particle layer -->
-  <div class="particles">
-    <div class="particle" style="left:10%; animation-duration:18s;"></div>
-    <div class="particle" style="left:30%; animation-duration:22s;"></div>
-    <div class="particle" style="left:50%; animation-duration:25s;"></div>
-    <div class="particle" style="left:70%; animation-duration:20s;"></div>
-    <div class="particle" style="left:90%; animation-duration:28s;"></div>
+
+  <!-- PARTICLES BACKGROUND -->
+  <div class="particles" id="particles"></div>
+
+  <div class="main-container">
+    <h1>Chatbot Boutique</h1>
+    <div id="chat"></div>
+    
+    <div class="input-area">
+      <!-- Subtle mobile UX upgrades without changing behavior -->
+      <input 
+        type="text" id="input" placeholder="Type a message..."
+        inputmode="text" autocomplete="on" autocapitalize="sentences" spellcheck="true"
+      >
+      <button id="send" aria-label="Send Message">
+        <i class="fas fa-paper-plane"></i>
+      </button>
+    </div>
+    
+    <footer>
+      <div class="attribution">
+        Designed by <a href="http://richardtokar.us" target="_blank" rel="noopener noreferrer">Richard Tokar</a>
+      </div>
+      <div class="social-icons">
+        <a href="YOUR_LINKEDIN_URL" target="_blank"><i class="fab fa-linkedin"></i></a>
+        <a href="YOUR_YOUTUBE_URL" target="_blank"><i class="fab fa-youtube"></i></a>
+      </div>
+    </footer>
   </div>
 
-  <!-- Chatbot container -->
-  <div class="chat-container">
-    <div class="chat-header">Chatbot Boutique</div>
-    <div class="chat-box">
-      <div class="chat-message welcome">How can I assist you today?</div>
-    </div>
-    <div class="chat-input-container">
-      <input type="text" class="chat-input" placeholder="Type a message..." />
-      <button class="send-btn">➤</button>
-    </div>
-    <div class="chat-footer">
-      © 2025 Chatbot Boutique — Designed for all devices
-    </div>
-  </div>
+  <script>
+    const chatDiv = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
+
+    function createUserMessage(message) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message user';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = message;
+      wrapper.appendChild(bubble);
+      return wrapper;
+    }
+
+    function createBotMessage(content) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message bot';
+      const bubble = document.createElement('div');
+      bubble.className = 'bubble';
+      bubble.textContent = content;
+      wrapper.appendChild(bubble);
+      return wrapper;
+    }
+
+    // Add initial welcome message
+    window.addEventListener("DOMContentLoaded", () => {
+      const welcome = createBotMessage("How can I assist you today?");
+      chatDiv.appendChild(welcome);
+      // Ensure we start scrolled to the bottom
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+    });
+
+    const handleSend = async () => {
+      const message = input.value.trim();
+      if (!message) return;
+
+      const userMessageEl = createUserMessage(message);
+      chatDiv.appendChild(userMessageEl);
+      input.value = "";
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+
+      const botPlaceholderEl = createBotMessage("...");
+      chatDiv.appendChild(botPlaceholderEl);
+      chatDiv.scrollTop = chatDiv.scrollHeight;
+
+      try {
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
+        const data = await res.json();
+        botPlaceholderEl.querySelector('.bubble').textContent = data.reply;
+        botPlaceholderEl.classList.add('new-message-animation');
+        setTimeout(() => botPlaceholderEl.classList.remove('new-message-animation'), 400);
+      } catch {
+        botPlaceholderEl.querySelector('.bubble').textContent = "Sorry, something went wrong. Please try again.";
+      } finally {
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+      }
+    };
+
+    send.addEventListener("click", handleSend);
+    input.addEventListener("keypress", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSend();
+      }
+    });
+
+    // Generate background particles (responsive + reduced motion aware)
+    const particlesContainer = document.getElementById("particles");
+    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const vw = Math.max(document.documentElement.clientWidth || 0, window.innerWidth || 0);
+    const particleCount = prefersReduced ? 0 : (vw < 480 ? 10 : vw < 1024 ? 16 : 20);
+
+    for (let i = 0; i < particleCount; i++) {
+      const p = document.createElement("div");
+      p.className = "particle";
+      const size = Math.random() * 6 + 3;
+      p.style.width = p.style.height = `${size}px`;
+      p.style.left = `${Math.random() * 100}%`;
+      p.style.animationDuration = `${8 + Math.random() * 8}s`;
+      p.style.animationDelay = `${Math.random() * 10}s`;
+      particlesContainer.appendChild(p);
+    }
+  </script>
 </body>
 </html>
