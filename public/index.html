@@ -7,6 +7,8 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
   <style>
     /* --- Dark Theme Inspired by Claude.ai --- */
     :root {
@@ -46,7 +48,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* --- Chat Container & Messages --- */
     #chat {
       flex-grow: 1; /* Allows the chat to fill available space */
       max-width: 800px;
@@ -80,22 +81,18 @@
       color: var(--text-color-secondary);
     }
 
-    /* Styling user vs bot messages without changing JS */
-    /* Selects every odd message (You, You, You...) */
     .message:nth-child(odd) {
       background-color: var(--user-message-bg);
       align-self: flex-end; /* Aligns to the right */
       border-bottom-right-radius: 4px;
     }
 
-    /* Selects every even message (Bot, Bot, Bot...) */
     .message:nth-child(even) {
       background-color: var(--bot-message-bg);
       align-self: flex-start; /* Aligns to the left */
       border-bottom-left-radius: 4px;
     }
 
-    /* --- Input Area --- */
     .input-area {
       display: flex;
       max-width: 800px;
@@ -141,6 +138,26 @@
       font-style: italic;
     }
 
+    /* ADDITION 3: Styles for the new footer */
+    footer {
+      text-align: center;
+      padding: 1.5rem 0 1rem 0; /* Adds vertical space */
+      max-width: 800px; /* Aligns with other content */
+      margin: 0 auto; /* Centers the footer */
+    }
+
+    footer a {
+      color: var(--text-color-secondary); /* Subtle icon color */
+      text-decoration: none;
+      margin: 0 0.75rem; /* Space between icons */
+      font-size: 1.5rem; /* Icon size */
+      transition: color 0.2s ease-in-out;
+    }
+
+    footer a:hover {
+      color: var(--accent-color); /* Highlight color on hover */
+    }
+
     /* --- Responsive Design for Mobile --- */
     @media (max-width: 600px) {
       body {
@@ -167,6 +184,10 @@
         font-size: 0.9rem;
         border-radius: 12px;
       }
+      footer a {
+        font-size: 1.3rem; /* Slightly smaller icons on mobile */
+        margin: 0 0.6rem;
+      }
     }
   </style>
 </head>
@@ -179,24 +200,32 @@
     <button id="send">Send</button>
   </div>
 
+  <footer>
+    <a href="https://www.linkedin.com/in/richardtokar" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
+      <i class="fab fa-linkedin"></i>
+    </a>
+    <a href="https://www.youtube.com/@richard_tokar" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
+      <i class="fab fa-youtube"></i>
+    </a>
+  </footer>
+
+
   <script>
     const chatDiv = document.getElementById("chat");
     const input = document.getElementById("input");
     const send = document.getElementById("send");
 
-    // Add event listener for the Enter key
     input.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevents the default action
-            send.click(); // Triggers the send button's click event
+            event.preventDefault();
+            send.click();
         }
     });
 
     send.onclick = async () => {
       const message = input.value;
-      if (!message.trim()) return; // Prevents sending empty messages
+      if (!message.trim()) return;
 
-      // Clear input and display user's message immediately
       input.value = "";
       const userMessageDiv = document.createElement('div');
       userMessageDiv.className = 'message';
@@ -204,14 +233,11 @@
       chatDiv.appendChild(userMessageDiv);
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
-
-      // Placeholder for bot's reply with a typing indicator
       const botPlaceholder = document.createElement('div');
       botPlaceholder.className = 'message';
       botPlaceholder.innerHTML = `<b>Bot:</b> <span class="typing-indicator">...</span>`;
       chatDiv.appendChild(botPlaceholder);
       chatDiv.scrollTop = chatDiv.scrollHeight;
-
 
       try {
         const res = await fetch("/api/chat", {
@@ -221,14 +247,12 @@
         });
 
         const data = await res.json();
-        // Update the placeholder with the actual reply
         botPlaceholder.innerHTML = `<b>Bot:</b> ${data.reply}`;
 
       } catch (error) {
           botPlaceholder.innerHTML = `<b>Bot:</b> Sorry, something went wrong. Please try again.`;
           console.error("Fetch error:", error);
       } finally {
-        // Ensure it scrolls to the bottom after the final message is rendered
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
     };
