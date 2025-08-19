@@ -5,94 +5,83 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Chatbot Boutique</title>
   
-  <!-- Google Fonts: Poppins -->
+  <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&family=Inter:wght@400;600&display=swap" rel="stylesheet">
   
-  <!-- Font Awesome for icons -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" xintegrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
   <style>
-    /* --- THEME & VARIABLES --- */
+    /* --- THEME COLORS --- */
     :root {
-      --bg-gradient-start: #2a2a35;
-      --bg-gradient-end: #1a1a20;
-      --chat-window-bg: rgba(0, 0, 0, 0.2);
-      --text-primary: #e0e0e0;
-      --text-secondary: #a0a0a0;
-      --accent-purple: #a855f7;
-      --accent-purple-light: #c084fc;
-      --bot-bubble-bg: #3A3A50;
-      --user-bubble-gradient-start: #7F5AF0;
-      --user-bubble-gradient-end: #623CEA;
-      --input-bg: #2A2A3A;
-      --border-color: #4A4A6A;
+      --bg-dark: #0f0f17;
+      --bg-gradient: radial-gradient(circle at top left, #1a1a26, #0f0f17 70%);
+      --text-primary: #e5e5e5;
+      --text-secondary: #9a9a9a;
+      --neon-magenta: #ff00ff;
+      --neon-cyan: #00ffff;
+      --lavender: #b388ff;
+      --bot-bubble: #242433;
+      --user-gradient: linear-gradient(135deg, var(--neon-magenta), var(--lavender));
+      --input-bg: #1c1c28;
     }
 
-    /* --- GLOBAL STYLES --- */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html, body {
-      height: 100%;
-    }
+    /* --- RESET --- */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Poppins', sans-serif;
-      background: radial-gradient(circle, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-gradient);
       color: var(--text-primary);
       display: grid;
       place-items: center;
+      height: 100vh;
       padding: 1rem;
+      overflow: hidden;
     }
 
     .main-container {
       width: 100%;
       max-width: 800px;
       height: 95vh;
-      max-height: 900px;
       display: flex;
       flex-direction: column;
     }
 
     /* --- HEADER --- */
     h1 {
-      font-weight: 700;
-      font-size: 2.25rem;
+      font-family: 'Orbitron', sans-serif;
+      font-weight: 600;
+      font-size: 2.5rem;
       text-align: center;
       margin-bottom: 1.5rem;
-      color: var(--accent-purple);
+      background: linear-gradient(90deg, var(--neon-magenta), var(--neon-cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 2px;
     }
 
     /* --- CHAT WINDOW --- */
     #chat {
       flex-grow: 1;
-      background-color: var(--chat-window-bg);
-      border-radius: 16px;
+      background-color: rgba(255, 255, 255, 0.03);
+      border-radius: 20px;
       padding: 1rem;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
-      box-shadow: inset 0 4px 10px rgba(0,0,0,0.3);
-      border: 1px solid var(--border-color);
+      box-shadow: inset 0 0 30px rgba(255, 0, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       margin-bottom: 1.5rem;
     }
-    
-    /* Custom Scrollbar */
-    #chat::-webkit-scrollbar { width: 8px; }
-    #chat::-webkit-scrollbar-track { background: transparent; }
+    #chat::-webkit-scrollbar { width: 6px; }
     #chat::-webkit-scrollbar-thumb {
-      background-color: #4A4A6A;
-      border-radius: 10px;
-      border: 2px solid transparent;
-      background-clip: content-box;
+      background: var(--neon-magenta);
+      border-radius: 4px;
     }
-    #chat::-webkit-scrollbar-thumb:hover { background-color: var(--accent-purple); }
 
     /* --- CHAT BUBBLES --- */
     .message {
@@ -102,70 +91,36 @@
       max-width: 85%;
     }
 
-    .message .bubble {
+    .bubble {
       padding: 0.75rem 1.25rem;
-      font-weight: 400;
       line-height: 1.5;
-      word-wrap: break-word;
-      border-radius: 22px; /* Softer, more rounded corners */
+      border-radius: 22px;
+      font-size: 1rem;
     }
 
-    /* Bot Message Styling */
-    .message.bot {
-      align-self: flex-start;
-    }
-    .message.bot .avatar {
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-    }
-    .message.bot .avatar svg {
-      width: 24px;
-      height: 24px;
-      fill: var(--accent-purple);
-    }
+    .message.bot { align-self: flex-start; }
     .message.bot .bubble {
-      background-color: var(--bot-bubble-bg);
-      border-top-left-radius: 6px;
+      background-color: var(--bot-bubble);
+      border: 1px solid rgba(255,255,255,0.1);
     }
 
-    /* User Message Styling */
-    .message.user {
-      align-self: flex-end;
-    }
+    .message.user { align-self: flex-end; }
     .message.user .bubble {
-      background: linear-gradient(90deg, var(--user-bubble-gradient-start), var(--user-bubble-gradient-end));
-      border-top-right-radius: 6px;
-    }
-    
-    /* New Message Animation */
-    @keyframes fadeSlideUp {
-      from {
-        opacity: 0;
-        transform: translateY(15px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-    .new-message-animation {
-      animation: fadeSlideUp 0.4s ease-out forwards;
+      background: var(--user-gradient);
+      color: #fff;
+      font-weight: 600;
+      border: none;
     }
 
     /* --- INPUT AREA --- */
     .input-area {
       display: flex;
       gap: 0.75rem;
-      background-color: var(--input-bg);
-      border-radius: 25px;
+      background: var(--input-bg);
+      border-radius: 30px;
       padding: 0.5rem;
       align-items: center;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Added depth */
+      box-shadow: 0 0 12px rgba(255, 0, 255, 0.2);
     }
 
     #input {
@@ -176,69 +131,66 @@
       padding: 0.5rem 1rem;
       font-size: 1rem;
       outline: none;
-      border-radius: 20px; /* Needed for the focus shadow */
-      transition: box-shadow 0.3s ease;
     }
     #input::placeholder { color: var(--text-secondary); }
-    #input:focus {
-      box-shadow: 0 0 8px rgba(168, 85, 247, 0.7); /* Purple glow on focus */
-    }
 
     #send {
-      flex-shrink: 0;
-      width: 40px;
-      height: 40px;
+      width: 45px;
+      height: 45px;
       border: none;
-      background-color: var(--accent-purple);
-      color: white;
       border-radius: 50%;
       cursor: pointer;
-      font-size: 1rem;
       display: grid;
       place-items: center;
-      transition: background-color 0.3s ease, transform 0.3s ease;
+      background: linear-gradient(135deg, var(--neon-magenta), var(--neon-cyan));
+      color: white;
+      font-size: 1.2rem;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
     }
     #send:hover {
-      background-color: var(--accent-purple-light);
-      transform: scale(1.05); /* Slight scale on hover */
+      transform: scale(1.1);
+      box-shadow: 0 0 12px var(--neon-magenta), 0 0 20px var(--neon-cyan);
     }
-    #send i { transform: translateX(1px); }
 
     /* --- FOOTER --- */
     footer {
       text-align: center;
-      padding-top: 1.5rem;
+      padding-top: 1rem;
     }
     .attribution {
-      font-size: 0.75rem; /* Smaller font size */
+      font-size: 0.75rem;
       color: var(--text-secondary);
-      margin-bottom: 0.75rem;
-      opacity: 0.7; /* Reduced opacity */
+      margin-bottom: 0.5rem;
     }
     .attribution a {
-      color: var(--text-primary);
+      color: var(--neon-cyan);
       text-decoration: none;
-      font-weight: bold;
-      transition: color 0.2s ease;
+      font-weight: 600;
     }
-    .attribution a:hover { color: var(--accent-purple); }
-    
+    .attribution a:hover { color: var(--neon-magenta); }
+
     .social-icons a {
-      color: var(--text-secondary);
+      color: var(--lavender);
       margin: 0 0.75rem;
       font-size: 1.5rem;
-      transition: color 0.3s ease, transform 0.3s ease;
+      transition: color 0.3s ease, text-shadow 0.3s ease;
     }
     .social-icons a:hover {
-      color: var(--accent-purple);
-      transform: scale(1.15); /* Grow on hover */
+      color: var(--neon-cyan);
+      text-shadow: 0 0 10px var(--neon-cyan);
     }
 
-    /* --- RESPONSIVE DESIGN --- */
+    /* --- MESSAGE ANIMATION --- */
+    @keyframes fadeSlideUp {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .new-message-animation {
+      animation: fadeSlideUp 0.4s ease-out forwards;
+    }
+
     @media (max-width: 600px) {
-      .main-container { height: 100%; max-height: none; }
       h1 { font-size: 1.75rem; }
-      #chat { padding: 0.75rem; }
       .message { max-width: 90%; }
     }
   </style>
@@ -261,13 +213,8 @@
         Designed by <a href="http://richardtokar.us" target="_blank" rel="noopener noreferrer">Richard Tokar</a>
       </div>
       <div class="social-icons">
-        <!-- Remember to replace these with your actual URLs -->
-        <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn Profile">
-          <i class="fab fa-linkedin"></i>
-        </a>
-        <a href="YOUR_YOUTUBE_URL" target="_blank" rel="noopener noreferrer" aria-label="YouTube Channel">
-          <i class="fab fa-youtube"></i>
-        </a>
+        <a href="YOUR_LINKEDIN_URL" target="_blank" rel="noopener noreferrer"><i class="fab fa-linkedin"></i></a>
+        <a href="YOUR_YOUTUBE_URL" target="_blank" rel="noopener noreferrer"><i class="fab fa-youtube"></i></a>
       </div>
     </footer>
   </div>
@@ -278,35 +225,23 @@
     const send = document.getElementById("send");
 
     function createUserMessage(message) {
-      const messageWrapper = document.createElement('div');
-      messageWrapper.className = 'message user';
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message user';
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
       bubble.textContent = message;
-      messageWrapper.appendChild(bubble);
-      return messageWrapper;
+      wrapper.appendChild(bubble);
+      return wrapper;
     }
 
     function createBotMessage(content, isTyping = false) {
-      const messageWrapper = document.createElement('div');
-      messageWrapper.className = 'message bot';
-      
-      const avatar = document.createElement('div');
-      avatar.className = 'avatar';
-      // New friendly SVG icon
-      avatar.innerHTML = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.486 2 2 6.486 2 12C2 17.514 6.486 22 12 22C17.514 22 22 17.514 22 12C22 6.486 17.514 2 12 2ZM12 20C7.589 20 4 16.411 4 12C4 7.589 7.589 4 12 4C16.411 4 20 7.589 20 12C20 16.411 16.411 20 12 20Z M8.5 11C7.672 11 7 11.672 7 12.5C7 13.328 7.672 14 8.5 14C9.328 14 10 13.328 10 12.5C10 11.672 9.328 11 8.5 11ZM15.5 11C14.672 11 14 11.672 14 12.5C14 13.328 14.672 14 15.5 14C16.328 14 17 13.328 17 12.5C17 11.672 16.328 11 15.5 11Z"/></svg>`;
-      
+      const wrapper = document.createElement('div');
+      wrapper.className = 'message bot';
       const bubble = document.createElement('div');
       bubble.className = 'bubble';
-      if (isTyping) {
-        bubble.innerHTML = '<span class="typing-indicator">...</span>';
-      } else {
-        bubble.textContent = content;
-      }
-      
-      messageWrapper.appendChild(avatar);
-      messageWrapper.appendChild(bubble);
-      return messageWrapper;
+      bubble.textContent = content || "...";
+      wrapper.appendChild(bubble);
+      return wrapper;
     }
 
     const handleSend = async () => {
@@ -329,29 +264,24 @@
           body: JSON.stringify({ message })
         });
         const data = await res.json();
-        
-        // Update placeholder with real reply and trigger animation
         botPlaceholderEl.querySelector('.bubble').textContent = data.reply;
         botPlaceholderEl.classList.add('new-message-animation');
-        // Remove class after animation to allow it to be re-triggered
         setTimeout(() => {
           botPlaceholderEl.classList.remove('new-message-animation');
         }, 400);
-
       } catch (error) {
         botPlaceholderEl.querySelector('.bubble').textContent = "Sorry, something went wrong. Please try again.";
-        console.error("Fetch error:", error);
       } finally {
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
     };
 
     send.addEventListener("click", handleSend);
-    input.addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            handleSend();
-        }
+    input.addEventListener("keypress", e => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        handleSend();
+      }
     });
   </script>
 </body>
