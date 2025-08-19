@@ -1,4 +1,7 @@
-import { Configuration, OpenAIApi } from "openai";
+// api/chat.js
+
+// 1. Change the import statement
+import OpenAI from "openai";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -12,12 +15,13 @@ export default async function handler(req, res) {
     return;
   }
 
-  const configuration = new Configuration({
+  // 2. Update the OpenAI client initialization
+  const openai = new OpenAI({
     apiKey: process.env.OPENAI_API_KEY,
   });
-  const openai = new OpenAIApi(configuration);
 
   try {
+    // This part of the code is correct for v4 and does not need to be changed
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: message }],
