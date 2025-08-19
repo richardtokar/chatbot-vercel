@@ -1,26 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Boutique</title>
+  <title>Chatbot Boutique</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-  <style>
-    /* --- Base & Theming --- */
+  <style>
+    /* --- Dark Theme Inspired by Claude.ai --- */
     :root {
-      --background-color: #1a1a1d;
-      --surface-color: #2c2f33;
-      --primary-color: #4a90e2;
-      --primary-hover-color: #357abd;
-      --user-message-color: #4f545c;
-      --bot-message-color: #2c3e50;
-      --text-color: #f0f0f0;
-      --border-color: #404040;
+      --background-color: #1e1e1e; /* Very dark grey */
+      --surface-color: #2d2d2d; /* Slightly lighter dark grey */
+      --text-color-primary: #e0e0e0; /* Light grey for primary text */
+      --text-color-secondary: #a8a8a8; /* Medium grey for less important text */
+      --accent-color: #5865f2; /* A modern, vibrant blue for accents */
+      --accent-hover-color: #4752c4;
+      --user-message-bg: #3a3a3a; /* Darker grey for user messages */
+      --bot-message-bg: #444444; /* Slightly lighter grey for bot messages */
+      --border-color: #333333;
     }
 
-    * {
+    * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
@@ -28,12 +29,9 @@
 
     html, body {
       height: 100%;
-    }
-
-    body {
       font-family: 'Inter', sans-serif;
       background-color: var(--background-color);
-      color: var(--text-color);
+      color: var(--text-color-primary);
       display: flex;
       flex-direction: column;
       padding: 1rem;
@@ -41,56 +39,58 @@
 
     h1 {
       text-align: center;
-      color: var(--primary-color);
+      color: var(--text-color-secondary);
       padding: 1rem 0;
-      font-weight: 700;
-      letter-spacing: 1px;
+      font-weight: 500;
+      font-size: 1.5rem;
+      letter-spacing: 0.5px;
     }
 
     /* --- Chat Container & Messages --- */
-    #chat {
+    #chat {
       flex-grow: 1; /* Allows the chat to fill available space */
       max-width: 800px;
       width: 100%;
       margin: 0 auto 1rem auto;
       background-color: var(--surface-color);
-      border-radius: 12px;
-      padding: 1.5rem;
+      border-radius: 8px;
+      padding: 1rem;
       overflow-y: auto; /* Enables scrolling for messages */
       display: flex;
       flex-direction: column;
-      gap: 1rem; /* Creates space between messages */
+      gap: 0.75rem; /* Creates space between messages */
       border: 1px solid var(--border-color);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
     }
 
-    .message {
-      padding: 0.75rem 1rem;
-      border-radius: 18px;
-      line-height: 1.5;
+    .message {
+      padding: 0.6rem 1rem;
+      border-radius: 12px;
+      line-height: 1.4;
       max-width: 80%;
       word-wrap: break-word; /* Prevents long words from overflowing */
+      color: var(--text-color-primary);
     }
 
     .message b {
       display: block;
-      font-size: 0.8em;
+      font-size: 0.85em;
       font-weight: 500;
-      margin-bottom: 0.25rem;
-      opacity: 0.7;
+      margin-bottom: 0.2rem;
+      color: var(--text-color-secondary);
     }
 
     /* Styling user vs bot messages without changing JS */
     /* Selects every odd message (You, You, You...) */
     .message:nth-child(odd) {
-      background-color: var(--user-message-color);
+      background-color: var(--user-message-bg);
       align-self: flex-end; /* Aligns to the right */
       border-bottom-right-radius: 4px;
     }
 
     /* Selects every even message (Bot, Bot, Bot...) */
     .message:nth-child(even) {
-      background-color: var(--bot-message-color);
+      background-color: var(--bot-message-bg);
       align-self: flex-start; /* Aligns to the left */
       border-bottom-left-radius: 4px;
     }
@@ -104,29 +104,28 @@
       gap: 0.5rem;
     }
 
-    #input {
+    #input {
       flex-grow: 1;
       border: 1px solid var(--border-color);
       background-color: var(--surface-color);
-      color: var(--text-color);
-      padding: 0.75rem 1rem;
-      border-radius: 20px;
+      color: var(--text-color-primary);
+      padding: 0.6rem 1rem;
+      border-radius: 16px;
       font-size: 1rem;
       transition: box-shadow 0.2s ease-in-out;
-      width: 80%; /* Original width for fallback */
     }
 
     #input:focus {
       outline: none;
-      box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.5);
+      box-shadow: 0 0 0 2px var(--accent-color);
     }
 
-    #send {
-      padding: 0.75rem 1.5rem;
+    #send {
+      padding: 0.6rem 1.2rem;
       border: none;
-      background-color: var(--primary-color);
+      background-color: var(--accent-color);
       color: white;
-      border-radius: 20px;
+      border-radius: 16px;
       cursor: pointer;
       font-size: 1rem;
       font-weight: 500;
@@ -134,7 +133,12 @@
     }
 
     #send:hover {
-      background-color: var(--primary-hover-color);
+      background-color: var(--accent-hover-color);
+    }
+
+    .typing-indicator {
+      color: var(--text-color-secondary);
+      font-style: italic;
     }
 
     /* --- Responsive Design for Mobile --- */
@@ -143,46 +147,57 @@
         padding: 0.5rem;
       }
       h1 {
-        font-size: 1.5rem;
+        font-size: 1.3rem;
       }
       #chat {
-        padding: 1rem;
+        padding: 0.75rem;
+        border-radius: 6px;
       }
       .message {
+        padding: 0.5rem 0.8rem;
+        border-radius: 10px;
+        font-size: 0.9rem;
         max-width: 90%;
       }
+      .input-area {
+        gap: 0.3rem;
+      }
+      #input, #send {
+        padding: 0.5rem 0.8rem;
+        font-size: 0.9rem;
+        border-radius: 12px;
+      }
     }
-  </style>
+  </style>
 </head>
 <body>
-  <h1>Chatbot Boutique</h1>
-  <div id="chat"></div>
+  <h1>Chatbot Boutique</h1>
+  <div id="chat"></div>
 
   <div class="input-area">
     <input type="text" id="input" placeholder="Type a message...">
-    <button id="send">Send</button>
+    <button id="send">Send</button>
   </div>
 
-  <script>
-    // --- THIS JAVASCRIPT IS UNCHANGED AND FULLY FUNCTIONAL ---
-    const chatDiv = document.getElementById("chat");
-    const input = document.getElementById("input");
-    const send = document.getElementById("send");
+  <script>
+    const chatDiv = document.getElementById("chat");
+    const input = document.getElementById("input");
+    const send = document.getElementById("send");
 
     // Add event listener for the Enter key
     input.addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevents the default action (form submission)
+            event.preventDefault(); // Prevents the default action
             send.click(); // Triggers the send button's click event
         }
     });
 
-    send.onclick = async () => {
-      const message = input.value;
-      if (!message.trim()) return; // Prevents sending empty messages
+    send.onclick = async () => {
+      const message = input.value;
+      if (!message.trim()) return; // Prevents sending empty messages
 
       // Clear input and display user's message immediately
-      input.value = "";
+      input.value = "";
       const userMessageDiv = document.createElement('div');
       userMessageDiv.className = 'message';
       userMessageDiv.innerHTML = `<b>You:</b> ${message}`;
@@ -190,10 +205,9 @@
       chatDiv.scrollTop = chatDiv.scrollHeight;
 
 
-      // Placeholder for bot's reply
+      // Placeholder for bot's reply with a typing indicator
       const botPlaceholder = document.createElement('div');
       botPlaceholder.className = 'message';
-      // Simple typing indicator
       botPlaceholder.innerHTML = `<b>Bot:</b> <span class="typing-indicator">...</span>`;
       chatDiv.appendChild(botPlaceholder);
       chatDiv.scrollTop = chatDiv.scrollHeight;
@@ -201,22 +215,23 @@
 
       try {
         const res = await fetch("/api/chat", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message })
-          });
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message })
+        });
 
-          const data = await res.json();
-          // Update the placeholder with the actual reply
-          botPlaceholder.innerHTML = `<b>Bot:</b> ${data.reply}`;
+        const data = await res.json();
+        // Update the placeholder with the actual reply
+        botPlaceholder.innerHTML = `<b>Bot:</b> ${data.reply}`;
 
       } catch (error) {
           botPlaceholder.innerHTML = `<b>Bot:</b> Sorry, something went wrong. Please try again.`;
           console.error("Fetch error:", error);
       } finally {
+        // Ensure it scrolls to the bottom after the final message is rendered
         chatDiv.scrollTop = chatDiv.scrollHeight;
       }
-    };
-  </script>
+    };
+  </script>
 </body>
 </html>
